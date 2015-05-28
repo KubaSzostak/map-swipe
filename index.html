@@ -55,8 +55,11 @@
                 var layer = map.getLayer(map.layerIds[j]);
                 if (layer.declaredClass == "esri.layers.ArcGISDynamicMapServiceLayer") {
                     layer.setVisibility(layer.id == id);
+                    if (layer.id == id) {
+                        document.getElementById("selectedLayerLabel").innerHTML = id;
+                    }
                 }
-            }
+            }            
         }
 
 
@@ -73,13 +76,15 @@
             "dojo/_base/array",
             "esri/layers/ArcGISDynamicMapServiceLayer",
             "dojo/parser",
+            "dojo/dom-construct",
+            "dojo/dom",
 
             "dijit/layout/BorderContainer", 
             "dijit/layout/ContentPane",
             "dojo/domReady!"
         ], function (
             Map, Search, FeatureLayer, InfoTemplate, SpatialReference, Extent, HomeButton, LayerSwipe,
-            arcgisUtils, array, ArcGISDynamicMapServiceLayer, parser) {
+            arcgisUtils, array, ArcGISDynamicMapServiceLayer, parser, domConstruct, dom) {
 
 
             function addLayer(id, url) {
@@ -88,6 +93,13 @@
                 layer.setVisibility(false);
                 map.addLayer(layer);
 
+                var toolPane = dom.byId("toolPane");
+                var btn = domConstruct.toDom("<button data-dojo-type='dijit.form.Button' onclick='setVisibleLayer(\"" + id + "\");'>" + id + "</button>");
+                var br = domConstruct.toDom("<br />");
+                domConstruct.create(btn, null, toolPane);
+                domConstruct.create(br, null, toolPane);
+                parser.parse(toolPane);                
+
                 return layer;
             }
 
@@ -95,8 +107,8 @@
 
             var map = new Map("mapDiv", {
                 basemap: "gray",
-                center: [19, 54], // lon, lat
-                zoom: 7,
+                center: [19, 54.3], // lon, lat
+                zoom: 9,
                 minZoom: 5,
                 maxZoom: 20
             });
@@ -118,8 +130,11 @@
 
             window.map = map;
 
-            addLayer("aa", "http://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Population_World/MapServer").setVisibility(true);
-            addLayer("bb", "http://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer").setVisibility(true);
+            addLayer("aa aa aa", "http://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Population_World/MapServer");
+            addLayer("bb - sdf", "http://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer");
+
+            setVisibleLayer("aa aa aa");
+
 
             var swipeWidget = new LayerSwipe({
                 type: "vertical",  //Try switching to "scope" or "horizontal"
@@ -147,12 +162,8 @@
                 <h3  design="headline" gutters="false" style="width: 100%; margin: 0; border-bottom:solid 2px silver; ">
                     Powodzie
                 </h3>
+                <h5 style="color: gray" id="selectedLayerLabel">Sel layer</h5>
                 <br />
-                <button data-dojo-type="dijit.form.Button" onclick="setVisibleLayer('bb');">Aerial</button>
-                <br />
-                <button data-dojo-type="dijit.form.Button" onclick="setVisibleLayer('aa');">Remove all layers</button>
-                <br />
-                <button data-dojo-type="dijit.form.Button" onclick="">Roads</button>
             </div>
         </div>
     </div>
