@@ -1,0 +1,161 @@
+﻿<!DOCTYPE html>
+<html dir="ltr">
+
+
+
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no" />
+    <title>ArcGIS API for JavaScript | Search widget with multiple sources</title>
+    <link rel="stylesheet" href="http://js.arcgis.com/3.13/dijit/themes/claro/claro.css">
+    <link rel="stylesheet" href="http://js.arcgis.com/3.13/esri/css/esri.css">
+    <style>
+        html,
+        body,
+        #border-container,
+        #mapDiv {
+            height: 100%;
+            margin: 0;
+        }
+      body {
+        background-color:#FFF;
+        overflow:hidden;
+        font-family:"Trebuchet MS";
+      }
+
+        button {
+            width: 100%;
+        }
+
+        #searchButton {
+            display: block;
+            position: absolute;
+            z-index: 2;
+            top: 20px;
+            left: 74px;
+        }
+
+        
+    #homeButton {
+      position: absolute;
+      top: 95px;
+      left: 20px;
+      z-index: 50;
+    }
+    </style>
+
+    <script src="http://js.arcgis.com/3.13/"></script>
+    <script>
+        
+
+        function setVisibleLayer(id)
+        {
+            for (var j = 0; j < map.layerIds.length; j++) {
+                var layer = map.getLayer(map.layerIds[j]);
+                if (layer.declaredClass == "esri.layers.ArcGISDynamicMapServiceLayer") {
+                    layer.setVisibility(layer.id == id);
+                }
+            }
+        }
+
+
+        require([
+            "esri/map",
+            "esri/dijit/Search",
+            "esri/layers/FeatureLayer",
+            "esri/InfoTemplate",
+            "esri/SpatialReference",
+            "esri/geometry/Extent",
+            "esri/dijit/HomeButton",
+            "esri/dijit/LayerSwipe",
+            "esri/arcgis/utils",
+            "dojo/_base/array",
+            "esri/layers/ArcGISDynamicMapServiceLayer",
+            "dojo/parser",
+
+            "dijit/layout/BorderContainer", 
+            "dijit/layout/ContentPane",
+            "dojo/domReady!"
+        ], function (
+            Map, Search, FeatureLayer, InfoTemplate, SpatialReference, Extent, HomeButton, LayerSwipe,
+            arcgisUtils, array, ArcGISDynamicMapServiceLayer, parser) {
+
+
+            function addLayer(id, url) {
+                var layer = new ArcGISDynamicMapServiceLayer(url);
+                layer.id = id;
+                layer.setVisibility(false);
+                map.addLayer(layer);
+
+                return layer;
+            }
+
+            parser.parse();
+
+            var map = new Map("mapDiv", {
+                basemap: "gray",
+                center: [19, 54], // lon, lat
+                zoom: 7,
+                minZoom: 5,
+                maxZoom: 20
+            });
+
+            var s = new Search({
+                enableButtonMode: true, //this enables the search widget to display as a single button
+                enableLabel: false,
+                enableInfoWindow: false,
+                showInfoWindowOnSelect: false,
+                sourceCountry: "PL",
+                map: map
+            }, "searchButton");
+            s.startup();
+
+            var home = new HomeButton({
+                map: map
+            }, "homeButton");
+            home.startup();
+
+            window.map = map;
+
+            addLayer("aa", "http://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Population_World/MapServer").setVisibility(true);
+            addLayer("bb", "http://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer").setVisibility(true);
+
+            var swipeWidget = new LayerSwipe({
+                type: "vertical",  //Try switching to "scope" or "horizontal"
+                map: map,
+                layers: []
+            }, "swipeDiv");
+            //swipeWidget.startup();
+
+        });
+    </script>
+</head>
+
+
+
+<body class="claro">
+    <div id="border-container" data-dojo-type="dijit/layout/BorderContainer" data-dojo-props="design:'headline',gutters:false">
+        <div id="mapDiv" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'center'"
+             style="padding: 0;">
+            <div id="swipeDiv"></div>
+            <div id="homeButton"></div>
+            <div id="searchButton"></div>
+        </div>
+        <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'left'" style="border:solid 2px silver; overflow:hidden; background-color: #ecedf6">
+            <div id="toolPane">
+                <h3  design="headline" gutters="false" style="width: 100%; margin: 0; border-bottom:solid 2px silver; ">
+                    Powodzie
+                </h3>
+                <br />
+                <button data-dojo-type="dijit.form.Button" onclick="setVisibleLayer('bb');">Aerial</button>
+                <br />
+                <button data-dojo-type="dijit.form.Button" onclick="setVisibleLayer('aa');">Remove all layers</button>
+                <br />
+                <button data-dojo-type="dijit.form.Button" onclick="">Roads</button>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
