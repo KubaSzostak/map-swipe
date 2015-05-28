@@ -52,13 +52,17 @@
         function setVisibleLayer(id)
         {
             for (var j = 0; j < map.layerIds.length; j++) {
+                var found = false;
                 var layer = map.getLayer(map.layerIds[j]);
                 if (layer.declaredClass == "esri.layers.ArcGISDynamicMapServiceLayer") {
                     layer.setVisibility(layer.id == id);
                     if (layer.id == id) {
+                        found = true;
                         document.getElementById("selectedLayerLabel").innerHTML = id;
                     }
                 }
+                if (!found)
+                    alert("Layer " + id + " not found.");
             }            
         }
 
@@ -130,8 +134,8 @@
 
             window.map = map;
 
-            addLayer("aa aa aa", "http://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Population_World/MapServer");
-            addLayer("bb - sdf", "http://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer");
+            addLayer("Test layer 1", "http://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Population_World/MapServer");
+            addLayer("Test layer 2", "http://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer");
 
             setVisibleLayer("aa aa aa");
 
