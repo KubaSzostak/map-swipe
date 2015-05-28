@@ -51,8 +51,8 @@
 
         function setVisibleLayer(id)
         {
+            var found = false;
             for (var j = 0; j < map.layerIds.length; j++) {
-                var found = false;
                 var layer = map.getLayer(map.layerIds[j]);
                 if (layer.declaredClass == "esri.layers.ArcGISDynamicMapServiceLayer") {
                     layer.setVisibility(layer.id == id);
@@ -61,9 +61,9 @@
                         document.getElementById("selectedLayerLabel").innerHTML = id;
                     }
                 }
-                if (!found)
-                    alert("Layer " + id + " not found.");
-            }            
+            }
+            if (!found)
+                alert("Layer " + id + " not found.");
         }
 
 
